@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class COW {
 	static void unnamed() {
 		//empty for now used to finetune this code lmao
+		
 	}
 	static int findCows(String str) {
 		int WCount=0; int number=0;
