@@ -1,127 +1,111 @@
 package silver;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class LightsOn {
-	static int x=1;
-	static int y=1;
-	static int count=1;
-	static char lastM='n';
-	static void next(boolean[][] OOO, int[][] lights) {
-		lights=sort(lights, 3);
-		System.out.println();
-		for (int i=0; i<lights.length; i++) {
-			for (int j=0; j<4; j++) {
-				System.out.print(lights[i][j]+" ");
+	static boolean[][] on;
+	static boolean[][] visited;
+	static int[] dx = new int[]{-1,1,0,0};
+	static int[] dy = new int[]{0,0,-1,1};
+	static ArrayList<Pair>[][] switches;
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br=new BufferedReader(new FileReader("lightson.in"));
+		PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter("lightson.out")));
+		String[] temp=br.readLine().split(" ");
+		int a=Integer.parseInt(temp[0]);
+		int b=Integer.parseInt(temp[1]);
+		switches = new ArrayList[a][a];
+		on = new boolean[a][a];
+		visited = new boolean[a][a];
+		for(int i = 0; i < a; i++) {
+			for(int j = 0; j < a; j++) {
+				switches[i][j] = new ArrayList<Pair>();
 			}
-			System.out.println();
 		}
-		boolean trap=false;
-		while (trap==false){
-			int tempx=x;
-			int tempy=y;
-			for (int i=0; i<OOO.length; i++) {
-				for (int j=0; j<OOO.length; j++) {
-					if (OOO[i][j]==true) {
-						turnOnLights(i, j, lights, OOO);
-					}
-					lastM='n';
-				}
-			}
-			// check if move or not
-			if (tempx==x && tempy==y) {
-				trap=true;
-				break;
-			} 
+		for(int i = 0; i < b; i++) {
+			String[] temp2=br.readLine().split(" ");
+			int x1 = Integer.parseInt(temp2[0])-1;
+			int y1 = Integer.parseInt(temp2[1])-1;
+			int x2 = Integer.parseInt(temp2[2])-1;
+			int y2 = Integer.parseInt(temp2[3])-1;
+			switches[x1][y1].add(new Pair(x2, y2));
 		}
-	}
-	static void turnOnLights(int m, int n, int[][] switches, boolean[][] OOO) {
-		for (int i=0; i<switches.length; i++) {
-			if (switches[i][0]==m+1 && switches[i][1]==n+1) {
-				OOO[switches[i][2]-1][switches[i][3]-1]=true;
-				count++;
-			}
-			move(OOO, switches[i][2], switches[i][3], lastM);
-		}
-		return;
-	}
-	static int[][] sort(int[][] n, int posi) {
-		for (int i=0; i<n.length; i++) {
-			for (int j=0; j<n.length-i-1; j++) {
-				if (n[j+1][posi]<n[j][posi]) {
-					int[] temp=n[j+1];
-					n[j+1]=n[j];
-					n[j]=temp;
+		LinkedList<Pair> q = new LinkedList<Pair>();
+		q.add(new Pair(0, 0));
+		on[0][0] = true;
+		// start by searching the top-left corner
+		search(0, 0);
+		int ret = 0;
+		for(boolean[] row: on) {
+			for(boolean col: row) {
+				if(col) {
+					ret++;
 				}
 			}
 		}
-		if (posi==0){
-			return n;
-		}
-		else {	
-			return sort(n, posi-1);
-		}
+		pw.println(ret);
+		pw.close();
 	}
-	
-	static void move(boolean[][] l, int tx, int ty, char last) {
-		//SOMEHOW WRITE THIS STUFF THINKSDUOFHISDHKJF
-		System.out.println(x+" "+y);
-		if (tx==x && ty==y) {
-			return;
-		}
-		// up
-		if (x>1 && l[x-2][y-1]==true && last!='d') {
-			x=x-1;
-			lastM='u';
-			move(l, tx, ty, lastM);
-		}
-		// left
-		else if (y>1 && l[x-1][y-2]==true && last!='r') {
-			y=y-1;
-			lastM='l';
-			move(l, tx, ty, lastM);
-		}
-		// down
-		else if (x<l.length && l[x][y-1]==true && last!='u') {
-			x=x+1;
-			lastM='d';
-			move(l, tx, ty, lastM);
-		}
-		// right
-		else if (y<l.length && l[x-1][y]==true && last!='l') {
-			y=y+1;
-			lastM='r';
-			move(l, tx, ty, lastM);
-		}
-		else {
-			return;
-		}
-	}
-	
-	public static void main(String[] args) {
-		Scanner reader=new Scanner(System.in);
-		String temp=reader.nextLine();
-		String[] num=temp.split(" ");
-		Integer dimensions=Integer.parseInt(num[0]);
-		Integer switches=Integer.parseInt(num[num.length-1]);
-		boolean[][] onOrOff=new boolean[dimensions][dimensions];
-		int[][] lights=new int[switches][4];
-		for (int i=0; i<dimensions; i++) {
-			for (int j=0; j<dimensions; j++) {
-				onOrOff[i][j]=false;			
+	public static void search(int x, int y) {
+		// if we've already searched this square, don't do it again to save time
+		if(isVisited(x, y)) return;
+		visited[x][y] = true;
+		for(Pair next: switches[x][y]) {
+			// step 1 - turn on all squares that Bessie can
+			if(!on[next.x][next.y]) {
+				on[next.x][next.y] = true;
+				if(hasVisitedNeighbor(next.x, next.y)) {
+					// this square is next to one Bessie can visit, so go search it
+					search(next.x, next.y);
+				}
 			}
 		}
-		onOrOff[0][0]=true;
-		for (int i=0; i<switches; i++) {
-			String next=reader.nextLine();
-			String[] temp2=next.split(" ");
-			for (int j=0; j<4; j++) {
-				lights[i][j]=Integer.parseInt(temp2[j]);
+		for(int k = 0; k < dx.length; k++) {
+			// check which neighbors of (x, y) are on
+			int nx = x + dx[k];
+			int ny = y + dy[k];
+			if(isOn(nx, ny)) {
+				// this is a neighboring square that was already on, so it can be visited
+				search(nx, ny);
 			}
 		}
-		reader.close();
-		
-		next(onOrOff, lights);
-		System.out.println(count);
+	}
+	/*
+	 * Returns true if and only if there is a visited neighbor of (x, y)
+	 */
+	public static boolean hasVisitedNeighbor(int x, int y) {
+		for(int k = 0; k < dx.length; k++) {
+			if(isOn(x + dx[k], y + dy[k]) && isVisited(x + dx[k], y + dy[k])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	/*
+	 * Returns true if and only if square (x, y) is on.
+	 */
+	public static boolean isOn(int x, int y) {
+		return x >= 0 && x < on.length && y >= 0 && y < on[x].length && on[x][y];
+	}
+	/*
+	 * Returns true if and only if square (x, y) has been visited
+	 */
+	public static boolean isVisited(int x, int y) {
+		return x >= 0 && x < visited.length && y >= 0 && y < visited[x].length && visited[x][y];
+	}
+	static class Pair{
+		int x,y;
+		public Pair(int a, int b){
+			x=a;
+			y=b;
+		}
 	}
 }
