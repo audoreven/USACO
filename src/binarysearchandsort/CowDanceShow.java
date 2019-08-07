@@ -1,4 +1,4 @@
-package simulation;
+package binarysearchandsort;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class CowDanceShow {
+	// REVIEW
 	static boolean possible(int[] shows, int k, int t) {
 		int lastT=0;
 		PriorityQueue<Integer> q = new PriorityQueue<Integer>();
