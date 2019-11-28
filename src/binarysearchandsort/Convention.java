@@ -46,6 +46,7 @@ public class Convention {
 				min = mid+1;
 			}
 		}
+		System.out.println(min);
 		System.out.println(max);
 	}
 }

@@ -1,7 +1,15 @@
-import java.io.*;
-import java.util.*;
+/*
+ID: audreyz1
+LANG: JAVA
+TASK: hamming
+*/
 
-public class test {
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.StringTokenizer;
+
+public class hamming {
     static ArrayList<String> attempt =new ArrayList<String>();
     static ArrayList<String> all =new ArrayList<String>();
     static String add="";
@@ -50,9 +58,9 @@ public class test {
         }
         return true;
     }
-
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br = new BufferedReader(new FileReader("hamming.in"));
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("hamming.out")));
         StringTokenizer st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int b = Integer.parseInt(st.nextToken());
@@ -70,9 +78,10 @@ public class test {
             for (int i=1+p*(10); i<plus+p*(10); i++) {
                 print=print.concat(" "+binToInt(attempt.get(i)));
             }
-            System.out.println(print);
+            pw.println(print);
             p++;
             n-=plus;
         }
+        pw.close();
     }
 }
